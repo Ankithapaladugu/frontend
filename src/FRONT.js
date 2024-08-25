@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Select from 'react-select';
 
 function FRONT() {
     const [jsonInput, setJsonInput] = useState('');
@@ -27,13 +28,8 @@ function FRONT() {
         }
     };
 
-    const handleOptionChange = (e) => {
-        const value = e.target.value;
-        setSelectedOptions(prev =>
-            prev.includes(value)
-                ? prev.filter(option => option !== value)
-                : [...prev, value]
-        );
+    const handleOptionChange = (selectedOptions) => {
+        setSelectedOptions(selectedOptions || []);
     };
 
     return (
@@ -53,31 +49,32 @@ function FRONT() {
 
             {responseData && (
                 <div style={styles.responseContainer}>
-                    <h2>Select what to display</h2>
-                    <select
-                        multiple
+                    <h2>Multi Filter</h2>
+                    <Select
+                        isMulti
+                        options={[
+                            { value: 'alphabets', label: 'Alphabets' },
+                            { value: 'numbers', label: 'Numbers' },
+                            { value: 'highest_lowercase_alphabet', label: 'Highest Lowercase Alphabet' }
+                        ]}
                         onChange={handleOptionChange}
-                        style={styles.select}
-                    >
-                        <option value="alphabets">Alphabets</option>
-                        <option value="numbers">Numbers</option>
-                        <option value="highest_lowercase_alphabet">Highest Lowercase Alphabet</option>
-                    </select>
+                        styles={customStyles}
+                    />
 
                     <div style={styles.results}>
-                        {selectedOptions.includes('alphabets') && (
+                        {selectedOptions.some(option => option.value === 'alphabets') && (
                             <div style={{ ...styles.result, ...styles.alphabets }}>
                                 <h3>Alphabets</h3>
                                 <p>{JSON.stringify(responseData.alphabets)}</p>
                             </div>
                         )}
-                        {selectedOptions.includes('numbers') && (
+                        {selectedOptions.some(option => option.value === 'numbers') && (
                             <div style={{ ...styles.result, ...styles.numbers }}>
                                 <h3>Numbers</h3>
                                 <p>{JSON.stringify(responseData.numbers)}</p>
                             </div>
                         )}
-                        {selectedOptions.includes('highest_lowercase_alphabet') && (
+                        {selectedOptions.some(option => option.value === 'highest_lowercase_alphabet') && (
                             <div style={{ ...styles.result, ...styles.highestLowercase }}>
                                 <h3>Highest Lowercase Alphabet</h3>
                                 <p>{JSON.stringify(responseData.highest_lowercase_alphabet)}</p>
@@ -134,17 +131,6 @@ const styles = {
         padding: '20px',
         borderRadius: '10px',
     },
-    select: {
-        width: '100%',
-        height: '100px',
-        padding: '10px',
-        fontSize: '16px',
-        borderRadius: '5px',
-        border: '1px solid #ccc',
-        boxSizing: 'border-box',
-        marginBottom: '20px',
-        backgroundColor: '#e0e0e0',
-    },
     results: {
         marginTop: '20px',
     },
@@ -165,4 +151,34 @@ const styles = {
     },
 };
 
+const customStyles = {
+    control: (base) => ({
+        ...base,
+        backgroundColor: '#e0e0e0',
+        borderRadius: '5px',
+        padding: '5px',
+        fontSize: '16px',
+    }),
+    multiValue: (base) => ({
+        ...base,
+        backgroundColor: '#007bff',
+        color: '#fff',
+        borderRadius: '5px',
+    }),
+    multiValueLabel: (base) => ({
+        ...base,
+        color: '#fff',
+    }),
+    multiValueRemove: (base) => ({
+        ...base,
+        color: '#fff',
+        cursor: 'pointer',
+        ':hover': {
+            backgroundColor: '#0056b3',
+            color: '#fff',
+        },
+    }),
+};
+
 export default FRONT;
+
