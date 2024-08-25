@@ -65,19 +65,19 @@ function FRONT() {
 
                     <div style={styles.results}>
                         {selectedOptions.includes('alphabets') && (
-                            <div style={styles.result}>
+                            <div style={{ ...styles.result, ...styles.alphabets }}>
                                 <h3>Alphabets</h3>
                                 <p>{JSON.stringify(responseData.alphabets)}</p>
                             </div>
                         )}
                         {selectedOptions.includes('numbers') && (
-                            <div style={styles.result}>
+                            <div style={{ ...styles.result, ...styles.numbers }}>
                                 <h3>Numbers</h3>
                                 <p>{JSON.stringify(responseData.numbers)}</p>
                             </div>
                         )}
                         {selectedOptions.includes('highest_lowercase_alphabet') && (
-                            <div style={styles.result}>
+                            <div style={{ ...styles.result, ...styles.highestLowercase }}>
                                 <h3>Highest Lowercase Alphabet</h3>
                                 <p>{JSON.stringify(responseData.highest_lowercase_alphabet)}</p>
                             </div>
@@ -129,6 +129,9 @@ const styles = {
     },
     responseContainer: {
         marginTop: '20px',
+        backgroundColor: '#f0f0f0',
+        padding: '20px',
+        borderRadius: '10px',
     },
     select: {
         width: '100%',
@@ -139,13 +142,27 @@ const styles = {
         border: '1px solid #ccc',
         boxSizing: 'border-box',
         marginBottom: '20px',
+        backgroundColor: '#e0e0e0',
     },
     results: {
         marginTop: '20px',
     },
     result: {
         marginBottom: '20px',
+        padding: '10px',
+        borderRadius: '5px',
+        color: '#fff',
+    },
+    alphabets: {
+        backgroundColor: '#4caf50',
+    },
+    numbers: {
+        backgroundColor: '#2196f3',
+    },
+    highestLowercase: {
+        backgroundColor: '#ff9800',
     },
 };
 
 export default FRONT;
+
