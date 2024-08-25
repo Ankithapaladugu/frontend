@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import Select from 'react-select';
 
 function FRONT() {
     const [jsonInput, setJsonInput] = useState('');
@@ -11,6 +10,7 @@ function FRONT() {
     const handleSubmit = async () => {
         try {
             const parsedData = JSON.parse(jsonInput);
+            setResponseData(null); // Clear previous response
             const response = await axios.post('https://backend-ibwt.onrender.com/bfhl', parsedData);
             setResponseData(response.data);
             setError('');
@@ -27,17 +27,22 @@ function FRONT() {
         }
     };
 
-    const handleSelectChange = (selected) => {
-        setSelectedOptions(selected || []);
+    const handleOptionChange = (e) => {
+        const value = e.target.value;
+        setSelectedOptions(prev =>
+            prev.includes(value)
+                ? prev.filter(option => option !== value)
+                : [...prev, value]
+        );
     };
 
     return (
         <div style={styles.container}>
-            <h1 style={styles.title}>API Input</h1>
+            <h1 style={styles.title}>Enter JSON Input</h1>
             <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                placeholder='{"data":["M","1","334","4","B"]}'
+                placeholder='Enter JSON here'
                 style={styles.textarea}
             />
             <button onClick={handleSubmit} style={styles.button}>Submit</button>
@@ -48,25 +53,36 @@ function FRONT() {
 
             {responseData && (
                 <div style={styles.responseContainer}>
-                    <h2>Multi Filter</h2>
-                    <Select
-                        isMulti
-                        options={[
-                            { value: 'alphabets', label: 'Alphabets' },
-                            { value: 'numbers', label: 'Numbers' },
-                            { value: 'highest_lowercase_alphabet', label: 'Highest Lowercase Alphabet' },
-                        ]}
-                        onChange={handleSelectChange}
-                        styles={customSelectStyles}
-                    />
+                    <h2>Select what to display</h2>
+                    <select
+                        multiple
+                        onChange={handleOptionChange}
+                        style={styles.select}
+                    >
+                        <option value="alphabets">Alphabets</option>
+                        <option value="numbers">Numbers</option>
+                        <option value="highest_lowercase_alphabet">Highest Lowercase Alphabet</option>
+                    </select>
 
                     <div style={styles.results}>
-                        {selectedOptions.map((option) => (
-                            <div key={option.value} style={styles.result}>
-                                <h3>{option.label}</h3>
-                                <p>{JSON.stringify(responseData[option.value])}</p>
+                        {selectedOptions.includes('alphabets') && (
+                            <div style={{ ...styles.result, ...styles.alphabets }}>
+                                <h3>Alphabets</h3>
+                                <p>{JSON.stringify(responseData.alphabets)}</p>
                             </div>
-                        ))}
+                        )}
+                        {selectedOptions.includes('numbers') && (
+                            <div style={{ ...styles.result, ...styles.numbers }}>
+                                <h3>Numbers</h3>
+                                <p>{JSON.stringify(responseData.numbers)}</p>
+                            </div>
+                        )}
+                        {selectedOptions.includes('highest_lowercase_alphabet') && (
+                            <div style={{ ...styles.result, ...styles.highestLowercase }}>
+                                <h3>Highest Lowercase Alphabet</h3>
+                                <p>{JSON.stringify(responseData.highest_lowercase_alphabet)}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
@@ -76,7 +92,7 @@ function FRONT() {
 
 const styles = {
     container: {
-        width: '50%',
+        width: '80%',
         margin: '0 auto',
         padding: '20px',
         fontFamily: 'Arial, sans-serif',
@@ -118,6 +134,17 @@ const styles = {
         padding: '20px',
         borderRadius: '10px',
     },
+    select: {
+        width: '100%',
+        height: '100px',
+        padding: '10px',
+        fontSize: '16px',
+        borderRadius: '5px',
+        border: '1px solid #ccc',
+        boxSizing: 'border-box',
+        marginBottom: '20px',
+        backgroundColor: '#e0e0e0',
+    },
     results: {
         marginTop: '20px',
     },
@@ -125,26 +152,17 @@ const styles = {
         marginBottom: '20px',
         padding: '10px',
         borderRadius: '5px',
-        backgroundColor: '#d4edda',
-        color: '#000',
+        color: '#fff',
     },
-};
-
-const customSelectStyles = {
-    control: (provided) => ({
-        ...provided,
-        marginBottom: '20px',
-        fontSize: '16px',
-    }),
-    multiValue: (provided) => ({
-        ...provided,
-        backgroundColor: '#007bff',
-        color: '#fff',
-    }),
-    multiValueLabel: (provided) => ({
-        ...provided,
-        color: '#fff',
-    }),
+    alphabets: {
+        backgroundColor: '#4caf50',
+    },
+    numbers: {
+        backgroundColor: '#2196f3',
+    },
+    highestLowercase: {
+        backgroundColor: '#ff9800',
+    },
 };
 
 export default FRONT;
