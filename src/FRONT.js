@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Select from 'react-select';
 
 function FRONT() {
     const [jsonInput, setJsonInput] = useState('');
@@ -26,22 +27,17 @@ function FRONT() {
         }
     };
 
-    const handleOptionChange = (e) => {
-        const value = e.target.value;
-        setSelectedOptions(prev =>
-            prev.includes(value)
-                ? prev.filter(option => option !== value)
-                : [...prev, value]
-        );
+    const handleSelectChange = (selected) => {
+        setSelectedOptions(selected || []);
     };
 
     return (
         <div style={styles.container}>
-            <h1 style={styles.title}>Enter JSON Input</h1>
+            <h1 style={styles.title}>API Input</h1>
             <textarea
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
-                placeholder='Enter JSON here'
+                placeholder='{"data":["M","1","334","4","B"]}'
                 style={styles.textarea}
             />
             <button onClick={handleSubmit} style={styles.button}>Submit</button>
@@ -52,36 +48,25 @@ function FRONT() {
 
             {responseData && (
                 <div style={styles.responseContainer}>
-                    <h2>Select what to display</h2>
-                    <select
-                        multiple
-                        onChange={handleOptionChange}
-                        style={styles.select}
-                    >
-                        <option value="alphabets">Alphabets</option>
-                        <option value="numbers">Numbers</option>
-                        <option value="highest_lowercase_alphabet">Highest Lowercase Alphabet</option>
-                    </select>
+                    <h2>Multi Filter</h2>
+                    <Select
+                        isMulti
+                        options={[
+                            { value: 'alphabets', label: 'Alphabets' },
+                            { value: 'numbers', label: 'Numbers' },
+                            { value: 'highest_lowercase_alphabet', label: 'Highest Lowercase Alphabet' },
+                        ]}
+                        onChange={handleSelectChange}
+                        styles={customSelectStyles}
+                    />
 
                     <div style={styles.results}>
-                        {selectedOptions.includes('alphabets') && (
-                            <div style={{ ...styles.result, ...styles.alphabets }}>
-                                <h3>Alphabets</h3>
-                                <p>{JSON.stringify(responseData.alphabets)}</p>
+                        {selectedOptions.map((option) => (
+                            <div key={option.value} style={styles.result}>
+                                <h3>{option.label}</h3>
+                                <p>{JSON.stringify(responseData[option.value])}</p>
                             </div>
-                        )}
-                        {selectedOptions.includes('numbers') && (
-                            <div style={{ ...styles.result, ...styles.numbers }}>
-                                <h3>Numbers</h3>
-                                <p>{JSON.stringify(responseData.numbers)}</p>
-                            </div>
-                        )}
-                        {selectedOptions.includes('highest_lowercase_alphabet') && (
-                            <div style={{ ...styles.result, ...styles.highestLowercase }}>
-                                <h3>Highest Lowercase Alphabet</h3>
-                                <p>{JSON.stringify(responseData.highest_lowercase_alphabet)}</p>
-                            </div>
-                        )}
+                        ))}
                     </div>
                 </div>
             )}
@@ -91,7 +76,7 @@ function FRONT() {
 
 const styles = {
     container: {
-        width: '80%',
+        width: '50%',
         margin: '0 auto',
         padding: '20px',
         fontFamily: 'Arial, sans-serif',
@@ -133,17 +118,6 @@ const styles = {
         padding: '20px',
         borderRadius: '10px',
     },
-    select: {
-        width: '100%',
-        height: '100px',
-        padding: '10px',
-        fontSize: '16px',
-        borderRadius: '5px',
-        border: '1px solid #ccc',
-        boxSizing: 'border-box',
-        marginBottom: '20px',
-        backgroundColor: '#e0e0e0',
-    },
     results: {
         marginTop: '20px',
     },
@@ -151,18 +125,26 @@ const styles = {
         marginBottom: '20px',
         padding: '10px',
         borderRadius: '5px',
-        color: '#fff',
-    },
-    alphabets: {
-        backgroundColor: '#4caf50',
-    },
-    numbers: {
-        backgroundColor: '#2196f3',
-    },
-    highestLowercase: {
-        backgroundColor: '#ff9800',
+        backgroundColor: '#d4edda',
+        color: '#000',
     },
 };
 
-export default FRONT;
+const customSelectStyles = {
+    control: (provided) => ({
+        ...provided,
+        marginBottom: '20px',
+        fontSize: '16px',
+    }),
+    multiValue: (provided) => ({
+        ...provided,
+        backgroundColor: '#007bff',
+        color: '#fff',
+    }),
+    multiValueLabel: (provided) => ({
+        ...provided,
+        color: '#fff',
+    }),
+};
 
+export default FRONT;
